@@ -18,6 +18,7 @@ import {
   InputRightElement,
   Alert,
   AlertIcon,
+  extendTheme,
 } from '@chakra-ui/react';
 import Navbar from './components/Navbar';
 import Calculate from './components/Calculate';
@@ -48,6 +49,14 @@ function App() {
       errorAlert('Some Error Occured');
     }
   };
+
+  const theme = extendTheme({
+    config: {
+      useSystemColorMode: true,
+      initialColorMode: 'dark',
+    },
+  });
+
   return (
     <ChakraProvider theme={theme}>
       <Flex flexDirection="column" height="100vh">
@@ -71,7 +80,7 @@ function App() {
             <Box
               minWidth="60vw"
               display="flex"
-              flexDirection="row"
+              flexDirection="column"
               justifyContent="center"
               alignItems="center"
             >
@@ -80,7 +89,7 @@ function App() {
                 value={url}
                 onChange={e => setUrl(e.target.value)}
               />
-              <Button colorScheme="teal" ml={4} onClick={urlSubmit}>
+              <Button colorScheme="teal" mt={8} onClick={urlSubmit}>
                 Submit
               </Button>
             </Box>
