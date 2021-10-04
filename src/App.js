@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   ChakraProvider,
   Box,
@@ -8,33 +8,87 @@ import {
   Code,
   Grid,
   theme,
+  Heading,
+  Flex,
+  Container,
+  StackDivider,
+  InputGroup,
+  Button,
+  Input,
+  InputRightElement,
+  Alert,
+  AlertIcon,
 } from '@chakra-ui/react';
-import { ColorModeSwitcher } from './ColorModeSwitcher';
-import { Logo } from './Logo';
+import Navbar from './components/Navbar';
+import Calculate from './components/Calculate';
+import axios from 'axios';
 
 function App() {
+  const [scoreUrl, setScoreUrl] = useState(null);
+  const [url, setUrl] = useState('');
+  const [urlErr, setUrlErr] = useState('');
+
+  const errorAlert = msg => {
+    setUrlErr(msg);
+    setTimeout(() => {
+      setUrlErr('');
+    }, 3000);
+  };
+
+  const urlSubmit = async () => {
+    if (url === '') {
+      errorAlert('PLease Enter the API URL');
+      return;
+    }
+    try {
+      await axios.get(url);
+      setScoreUrl(url + 'scoring');
+    } catch (error) {
+      console.log(error);
+      errorAlert('Some Error Occured');
+    }
+  };
   return (
     <ChakraProvider theme={theme}>
-      <Box textAlign="center" fontSize="xl">
-        <Grid minH="100vh" p={3}>
-          <ColorModeSwitcher justifySelf="flex-end" />
-          <VStack spacing={8}>
-            <Logo h="40vmin" pointerEvents="none" />
-            <Text>
-              Edit <Code fontSize="xl">src/App.js</Code> and save to reload.
-            </Text>
-            <Link
-              color="teal.500"
-              href="https://chakra-ui.com"
-              fontSize="2xl"
-              target="_blank"
-              rel="noopener noreferrer"
+      <Flex flexDirection="column" height="100vh">
+        <Navbar />
+        {urlErr !== '' && (
+          <Alert status="error">
+            <AlertIcon />
+            {urlErr}
+          </Alert>
+        )}
+
+        {scoreUrl === null ? (
+          <Box
+            flexGrow="1"
+            flexShrink="1"
+            flexBasis="auto"
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+          >
+            <Box
+              minWidth="60vw"
+              display="flex"
+              flexDirection="row"
+              justifyContent="center"
+              alignItems="center"
             >
-              Learn Chakra
-            </Link>
-          </VStack>
-        </Grid>
-      </Box>
+              <Input
+                placeholder="Enter the scoring api url"
+                value={url}
+                onChange={e => setUrl(e.target.value)}
+              />
+              <Button colorScheme="teal" ml={4} onClick={urlSubmit}>
+                Submit
+              </Button>
+            </Box>
+          </Box>
+        ) : (
+          <Calculate errorAlert={errorAlert} scoreUrl={scoreUrl} />
+        )}
+      </Flex>
     </ChakraProvider>
   );
 }
